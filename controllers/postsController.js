@@ -110,11 +110,99 @@ const createNewPost = asyncHandler(async (req, res) => {
 // @desc Edit a posts
 // @router PUT /posts/:id
 // @access Private
-const updatePost = asyncHandler(async (req, res) => {});
+const updatePost = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+
+  if (
+    (req.body.author && !req.body.roles.includes("GOD")) ||
+    (req.body.reviews && !req.body.roles.includes("GOD"))
+  ) {
+    return res
+      .status(400)
+      .json({ message: "Hacking attampt please fuck off!", success: false });
+  }
+
+  if (!id) {
+    res.status(400).json({ success: false, message: "Please provide an ID" });
+  }
+
+  const post = await Post.findById(id).populate("author");
+
+  if (!post) {
+    res.status(400).json({ success: false, message: "Post not found!" });
+  }
+
+  if (post.author.email !== req.email) {
+    res.status(400).json({ success: false, message: "Forbidden!" });
+  }
+
+  // slug
+  if (req.body.title && post.title !== req.body.title) {
+    const slug = `${req.body.title}-${
+      post.author.username
+    }-${new Date().toISOString()}`;
+
+    post.slug = slug;
+  }
+
+  for (const [key, value] of Object.entries(req.body)) {
+    post[key] = value;
+    if (key === "tags") {
+      for (const tag of value) {
+        post[key].push(tag);
+      }
+    }
+  }
+
+  const updatedPost = await post.save();
+
+  if (!updatedPost) {
+    res.status(400).json({ success: false, message: "Post not found!" });
+  } else {
+    res.status(201).json({
+      success: true,
+      data: updatedPost,
+      message: `Success update ${updatedPost.title}!`,
+    });
+  }
+});
 
 // @desc Delete a posts
 // @router DELETE /posts/:id
 // @access Private
-const deletePost = asyncHandler(async (req, res) => {});
+const deletePost = asyncHandler(async (req, res) => {
+  const id = req.params.id;
 
-module.exports = { getAllPosts, getPost, createNewPost, updatePost, deletePost };
+  if (!id) {
+    res.status(400).json({ success: false, message: "Please provide an ID" });
+  }
+
+  const post = await Post.findById(id).populate("author");
+
+  if (!post) {
+    res.status(400).json({ success: false, message: "Post not found!" });
+  }
+
+  if (post.author.email !== req.email) {
+    res.status(400).json({ success: false, message: "Forbidden!" });
+  }
+
+  const result = await post.deleteOne();
+
+  if (!result) {
+    res.status(400).json({ success: false, message: "Error deleting post!" });
+  } else {
+    res.status(200).json({
+      success: true,
+      message: `User ${result.title} successfully deleted!`,
+    });
+  }
+});
+
+module.exports = {
+  getAllPosts,
+  getPost,
+  createNewPost,
+  updatePost,
+  deletePost,
+};

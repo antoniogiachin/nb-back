@@ -31,7 +31,7 @@ const createNewUser = asyncHandler(async (req, res) => {
     !username ||
     !email ||
     !birthDate ||
-    typeof isAuthor !== "boolean" ||
+    (isAuthor && typeof isAuthor !== "boolean") ||
     password.length < 6
   ) {
     res
@@ -86,7 +86,7 @@ const createNewUser = asyncHandler(async (req, res) => {
 });
 
 // @desc Update a user
-// @router PATCH /users
+// @router PUT /users
 // @access Private
 const updateUser = asyncHandler(async (req, res) => {
   const id = req.params.id;
@@ -97,7 +97,7 @@ const updateUser = asyncHandler(async (req, res) => {
     req.body.birthDate ||
     req.body.posts ||
     req.body.slug ||
-    req.body.roles
+    req.body.roles.includes("GOD")
   ) {
     return res
       .status(400)
@@ -115,9 +115,21 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 
   for (const [key, value] of Object.entries(req.body)) {
-    user[key] = value;
     if (key === "password") {
       user[password] = bcrypt.hash(value, 10);
+    } else if (key === "roles") {
+      const roleSet = new Set([...user[key]]);
+      for (const role of value) {
+        roleSet.add(role);
+        user[key] = Array.from(roleSet);
+      }
+
+      if (value.includes("author") || value.includes("Author")) {
+        console.log();
+        user.isAuthor = true;
+      }
+    } else {
+      user[key] = value;
     }
   }
 

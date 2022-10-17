@@ -41,16 +41,19 @@ const userSchema = new mongoose.Schema(
       {
         type: String,
         default: "User",
+        required: false,
       },
     ],
     isAuthor: {
       type: Boolean,
       default: false,
+      required: false,
     },
     posts: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post",
+        required: false,
       },
     ],
   },
