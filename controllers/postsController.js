@@ -110,11 +110,11 @@ const createNewPost = asyncHandler(async (req, res) => {
 // @desc Edit a posts
 // @router PUT /posts/:id
 // @access Private
-const editPost = asyncHandler(async (req, res) => {});
+const updatePost = asyncHandler(async (req, res) => {});
 
 // @desc Delete a posts
 // @router DELETE /posts/:id
 // @access Private
 const deletePost = asyncHandler(async (req, res) => {});
 
-module.exports = { getAllPosts, getPost, createNewPost };
+module.exports = { getAllPosts, getPost, createNewPost, updatePost, deletePost };

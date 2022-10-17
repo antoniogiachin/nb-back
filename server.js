@@ -39,9 +39,11 @@ app.use("/", express.static(path.join(__dirname, "public")));
 app.use("/", require("./routes/root"));
 
 // auth route
-app.use('/auth', require('./routes/authRoutes.js'))
+app.use("/auth", require("./routes/authRoutes.js"));
 // user route
-app.use('/users', require('./routes/userRoutes.js'))
+app.use("/users", require("./routes/userRoutes.js"));
+// post route
+app.use("/posts", require("./routes/postRoutes.js"));
 
 // 404 tutto cio' che non viene intercettato prima
 app.all("*", (req, res) => {
