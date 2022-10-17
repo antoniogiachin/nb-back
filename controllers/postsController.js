@@ -117,4 +117,4 @@ const editPost = asyncHandler(async (req, res) => {});
 // @access Private
 const deletePost = asyncHandler(async (req, res) => {});
 
-module.exports = { getAllPosts, getPost };
+module.exports = { getAllPosts, getPost, createNewPost };
