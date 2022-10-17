@@ -46,6 +46,8 @@ app.use("/users", require("./routes/userRoutes.js"));
 app.use("/posts", require("./routes/postRoutes.js"));
 // tag route
 app.use("/tags", require("./routes/tagRoutes.js"));
+// review route
+app.use("/reviews", require("./routes/reviewRoutes.js"));
 
 // 404 tutto cio' che non viene intercettato prima
 app.all("*", (req, res) => {

@@ -90,6 +90,7 @@ const createNewUser = asyncHandler(async (req, res) => {
 // @access Private
 const updateUser = asyncHandler(async (req, res) => {
   const id = req.params.id;
+
   if (
     req.body.name ||
     req.body.surname ||
@@ -112,6 +113,10 @@ const updateUser = asyncHandler(async (req, res) => {
 
   if (!user) {
     res.status(400).json({ success: false, message: "User not found!" });
+  }
+
+  if (user.email !== req.email) {
+    res.status(400).json({ success: false, message: "Forbidden!" });
   }
 
   for (const [key, value] of Object.entries(req.body)) {
@@ -161,6 +166,10 @@ const deleteUser = asyncHandler(async (req, res) => {
 
   if (!user) {
     res.status(400).json({ success: false, message: "User not found!" });
+  }
+
+  if (user.email !== req.email) {
+    res.status(400).json({ success: false, message: "Forbidden!" });
   }
 
   if (user.posts.length && deleteAllPosts) {

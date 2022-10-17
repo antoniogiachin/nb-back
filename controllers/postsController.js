@@ -56,7 +56,7 @@ const createNewPost = asyncHandler(async (req, res) => {
     });
   }
 
-  if (!roles.includes("author")) {
+  if (!roles.includes("author") || !roles.includes("Author")) {
     return res.status(400).json({
       success: false,
       message: "You're not an author, can't proceed creating post!",
@@ -126,6 +126,10 @@ const updatePost = asyncHandler(async (req, res) => {
     res.status(400).json({ success: false, message: "Please provide an ID" });
   }
 
+  if (!req.roles.includes("author") || !req.roles.includes("Author")) {
+    res.status(400).json({ success: false, message: "Forbidden" });
+  }
+
   const post = await Post.findById(id).populate("author");
 
   if (!post) {
@@ -175,6 +179,10 @@ const deletePost = asyncHandler(async (req, res) => {
 
   if (!id) {
     res.status(400).json({ success: false, message: "Please provide an ID" });
+  }
+
+  if (!req.roles.includes("author") || !req.roles.includes("Author")) {
+    res.status(400).json({ success: false, message: "Forbidden" });
   }
 
   const post = await Post.findById(id).populate("author");

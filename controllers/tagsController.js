@@ -1,7 +1,6 @@
 const Tag = require("../models/Tag");
 const asyncHandler = require("express-async-handler");
 
-
 // @desc Get all tags
 // @router GET /tags
 // @access Public
@@ -34,7 +33,7 @@ const getTag = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: `Tag ${tag.title} fetched successfully!`,
+    message: `Tag '${tag.name}' fetched successfully!`,
     data: tag,
   });
 });
