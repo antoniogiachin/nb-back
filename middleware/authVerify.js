@@ -21,7 +21,7 @@ const authVerify = (req, res, next) => {
 
     //altrimenti provide al next email e roles
     req.email = decoded.UserInfo.username;
-    req.rolse = decoded.UserInfo.roles;
+    req.roles = decoded.UserInfo.roles;
     next();
   });
 };
