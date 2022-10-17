@@ -7,7 +7,7 @@ const asyncHandler = require("express-async-handler");
 // @router GET /posts
 // @access Public
 const getAllPosts = asyncHandler(async (req, res) => {
-  const posts = await Post.find().populate("author").populate("tags");
+  const posts = await Post.find(req.query).populate("author").populate("tags");
 
   if (!posts) {
     res.status(400).json({ success: false, message: "Error fetching posts!" });
