@@ -16,4 +16,6 @@ router
   .put(authVerify, postsController.updatePost)
   .delete(authVerify, postsController.deletePost);
 
+router.route("/user/:email").get(postsController.getAllUserPosts);
+
 module.exports = router;

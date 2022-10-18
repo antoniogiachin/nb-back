@@ -18,6 +18,32 @@ const getAllPosts = asyncHandler(async (req, res) => {
     .json({ success: true, message: "All posts fetched!", data: posts });
 });
 
+// @desc Get all user posts
+// @router GET /posts
+// @access Public
+const getAllUserPosts = asyncHandler(async (req, res) => {
+  const email = req.params.email;
+  console.log(email);
+
+  const user = await User.find({ email });
+
+  if (!user) {
+    res.status(400).json({ success: false, message: "Error fetching user!" });
+  }
+
+  const posts = await Post.find({ author: user._id })
+    .populate("reviews")
+    .populate("tags");
+
+  if (!posts) {
+    res.status(400).json({ success: false, message: "Error fetching posts!" });
+  }
+
+  res
+    .status(200)
+    .json({ success: true, message: "All user posts fetched!", data: posts });
+});
+
 // @desc Get single post
 // @router GET /posts/:id
 // @access Public
@@ -210,6 +236,7 @@ const deletePost = asyncHandler(async (req, res) => {
 module.exports = {
   getAllPosts,
   getPost,
+  getAllUserPosts,
   createNewPost,
   updatePost,
   deletePost,
