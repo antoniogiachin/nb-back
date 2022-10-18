@@ -21,7 +21,7 @@ const login = asyncHandler(async (req, res) => {
   if (!foundUser) {
     return res
       .status(400)
-      .json({ success: false, message: "User not found, Unauthorized!" });
+      .json({ success: false, message: "User not found, Please chek email and password!" });
   }
 
   const matchPwd = await bcrypt.compare(password, foundUser.password);
@@ -29,7 +29,7 @@ const login = asyncHandler(async (req, res) => {
   if (!matchPwd) {
     return res
       .status(400)
-      .json({ success: false, message: "Wrong password, Unauthorized!" });
+      .json({ success: false, message: "Wrong password, please enter your password!" });
   }
 
   // token, viene restituito come res.json
