@@ -9,7 +9,7 @@ const corsOptions = {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true, //header handled al posto nostro
+  credentials: true, //cookies handled al posto nostro
   optionSuccessStatus: 200,
 };
 

@@ -47,7 +47,7 @@ const login = asyncHandler(async (req, res) => {
   );
   // refresh token restituito come res.cookie (per le future chiamate per avere un nuovo token)
   const refreshToken = jwt.sign(
-    { username: foundUser.username },
+    { email: foundUser.email },
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: "7d",
@@ -56,7 +56,7 @@ const login = asyncHandler(async (req, res) => {
 
   res.cookie("jwt", refreshToken, {
     httpOnly: true, //accessibile sol oda web browser
-    //secure: true, //https disattivo per test
+    secure: true, //https disattivo per test
     sameSite: "None", //cors
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
   });
@@ -70,6 +70,7 @@ const login = asyncHandler(async (req, res) => {
       email: foundUser.surname,
       username: foundUser.surname,
       posts: foundUser.posts,
+      isAuthor: foundUser.isAuthor,
     },
   });
 });
@@ -90,7 +91,7 @@ const refresh = (req, res) => {
 
   // token verify, ha terzo parametro handler dopo verifica
   const isValidToken = jwt.verify(
-    refreshToken,
+    cookies?.jwt,
     process.env.REFRESH_TOKEN_SECRET,
     asyncHandler(async (err, decoded) => {
       if (err) {
@@ -100,7 +101,7 @@ const refresh = (req, res) => {
         });
       }
 
-      const foundUser = await User.findOne({ email });
+      const foundUser = await User.findOne({ email: decoded.email });
 
       if (!foundUser) {
         return res.status(401).json({
@@ -112,7 +113,7 @@ const refresh = (req, res) => {
       const newAccessToken = jwt.sign(
         {
           UserInfo: {
-            username: foundUser.email,
+            email: foundUser.email,
             roles: foundUser.roles,
           },
         },
@@ -126,9 +127,10 @@ const refresh = (req, res) => {
         user: {
           name: foundUser.name,
           surname: foundUser.surname,
-          email: foundUser.surname,
-          username: foundUser.surname,
+          email: foundUser.email,
+          username: foundUser.username,
           posts: foundUser.posts,
+          isAuthor: foundUser.isAuthor,
         },
       });
     })

@@ -1,5 +1,5 @@
 const allowedOrigins = [
-  "http://localhost:3000", // react app
+  "http://localhost:5173", // react app
   "https://www.ilmiositofuturo.it",
 ];
 
