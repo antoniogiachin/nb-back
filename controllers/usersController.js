@@ -28,7 +28,6 @@ const createNewUser = asyncHandler(async (req, res) => {
   const { name, surname, username, email, password, birthDate, isAuthor } =
     req.body;
 
-  console.log(req.file.path);
   // path per eliminazione in caso di errore
   const profilePicturesPath = path.join(
     __dirname,
@@ -47,7 +46,6 @@ const createNewUser = asyncHandler(async (req, res) => {
     !username ||
     !email ||
     !birthDate ||
-    (isAuthor && typeof isAuthor !== "boolean") ||
     password.length < 6
   ) {
     fs.unlink(profilePicturesPath, (err) => {
@@ -60,7 +58,7 @@ const createNewUser = asyncHandler(async (req, res) => {
 
   // check for duplicates
   const userDuplicate = await User.findOne({ username }).lean();
-  console.log(userDuplicate);
+
   if (userDuplicate) {
     fs.unlink(profilePicturesPath, (err) => {
       if (err) console.log(err);
@@ -186,7 +184,6 @@ const updateUser = asyncHandler(async (req, res) => {
       }
 
       if (value.includes("author") || value.includes("Author")) {
-        console.log();
         user.isAuthor = true;
       }
     } else if (key === "profilePicture") {

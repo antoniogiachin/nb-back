@@ -19,17 +19,19 @@ const login = asyncHandler(async (req, res) => {
   const foundUser = await User.findOne({ email });
 
   if (!foundUser) {
-    return res
-      .status(400)
-      .json({ success: false, message: "User not found, Please chek email and password!" });
+    return res.status(400).json({
+      success: false,
+      message: "User not found, Please chek email and password!",
+    });
   }
 
   const matchPwd = await bcrypt.compare(password, foundUser.password);
 
   if (!matchPwd) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Wrong password, please enter your password!" });
+    return res.status(400).json({
+      success: false,
+      message: "Wrong password, please enter your password!",
+    });
   }
 
   // token, viene restituito come res.json
@@ -61,17 +63,24 @@ const login = asyncHandler(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
   });
 
+  const userResponse = {
+    name: foundUser.name,
+    surname: foundUser.surname,
+    email: foundUser.email,
+    username: foundUser.username,
+    posts: foundUser.posts,
+    isAuthor: foundUser.isAuthor,
+    birthDate: foundUser.birthDate,
+  };
+
+  if (foundUser.profilePicture) {
+    userResponse.profilePicture = foundUser.profilePicture;
+  }
+
   res.json({
     success: true,
     accessToken,
-    user: {
-      name: foundUser.name,
-      surname: foundUser.surname,
-      email: foundUser.surname,
-      username: foundUser.surname,
-      posts: foundUser.posts,
-      isAuthor: foundUser.isAuthor,
-    },
+    user: userResponse,
   });
 });
 
@@ -121,17 +130,24 @@ const refresh = (req, res) => {
         { expiresIn: "15m" }
       );
 
+      const userResponse = {
+        name: foundUser.name,
+        surname: foundUser.surname,
+        email: foundUser.email,
+        username: foundUser.username,
+        posts: foundUser.posts,
+        isAuthor: foundUser.isAuthor,
+        birthDate: foundUser.birthDate,
+      };
+
+      if (foundUser.profilePicture) {
+        userResponse.profilePicture = foundUser.profilePicture;
+      }
+
       res.json({
         success: true,
         accessToken: newAccessToken,
-        user: {
-          name: foundUser.name,
-          surname: foundUser.surname,
-          email: foundUser.email,
-          username: foundUser.username,
-          posts: foundUser.posts,
-          isAuthor: foundUser.isAuthor,
-        },
+        user: userResponse,
       });
     })
   );
