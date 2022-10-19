@@ -36,6 +36,9 @@ app.use(cors(corsOptions)); // chiunque puo fare richieste va messa in sicurezza
 // qui diciamo ad express dove trovare i file statici (come css) - dirname dice di vedere nella cartella del progetto
 app.use("/", express.static(path.join(__dirname, "public")));
 
+// altro file statico in cartella profilepictures per renderle pubbliche
+app.use("/profilePictures", express.static("profilePictures"));
+
 app.use("/", require("./routes/root"));
 
 // auth route

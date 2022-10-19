@@ -3,6 +3,9 @@ const Post = require("../models/Post");
 // async handler
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
+// fs for remove file
+const fs = require("fs");
+const path = require("path");
 
 // @Get all users
 // @router GET /users
@@ -25,6 +28,19 @@ const createNewUser = asyncHandler(async (req, res) => {
   const { name, surname, username, email, password, birthDate, isAuthor } =
     req.body;
 
+  console.log(req.file.path);
+  // path per eliminazione in caso di errore
+  const profilePicturesPath = path.join(
+    __dirname,
+    "..",
+    "profilePictures",
+    req.file.path.split("/")[1]
+  );
+  //  delete img se errore
+  // fs.unlink(profilePicturesPath, (err) => {
+  //   if (err) console.log(err);
+  // });
+
   if (
     !name ||
     !surname ||
@@ -34,6 +50,9 @@ const createNewUser = asyncHandler(async (req, res) => {
     (isAuthor && typeof isAuthor !== "boolean") ||
     password.length < 6
   ) {
+    fs.unlink(profilePicturesPath, (err) => {
+      if (err) console.log(err);
+    });
     res
       .status(400)
       .json({ success: false, message: "All fields are required" });
@@ -43,10 +62,16 @@ const createNewUser = asyncHandler(async (req, res) => {
   const userDuplicate = await User.findOne({ username }).lean();
   console.log(userDuplicate);
   if (userDuplicate) {
+    fs.unlink(profilePicturesPath, (err) => {
+      if (err) console.log(err);
+    });
     return res.status(409).json("Username already taken");
   }
   const emailDuplicate = await User.findOne({ email }).lean();
   if (emailDuplicate) {
+    fs.unlink(profilePicturesPath, (err) => {
+      if (err) console.log(err);
+    });
     return res.status(409).json("Email already taken");
   }
 
@@ -69,6 +94,7 @@ const createNewUser = asyncHandler(async (req, res) => {
     roles,
     slug: `username.${new Date().toISOString()}`,
     password: hashedPwd,
+    profilePicture: req.file.path,
   };
 
   // create e store user
@@ -79,6 +105,9 @@ const createNewUser = asyncHandler(async (req, res) => {
       .status(201)
       .json({ success: true, data: user, message: `New ${username} created` });
   } else {
+    fs.unlink(profilePicturesPath, (err) => {
+      if (err) console.log(err);
+    });
     res
       .status(400)
       .json({ success: false, message: `Error creating ${username}` });
@@ -90,6 +119,15 @@ const createNewUser = asyncHandler(async (req, res) => {
 // @access Private
 const updateUser = asyncHandler(async (req, res) => {
   const id = req.params.id;
+  if (req.file) {
+    // path per eliminazione in caso di errore
+    const profilePicturesPath = path.join(
+      __dirname,
+      "..",
+      "profilePictures",
+      req.file.path.split("/")[1]
+    );
+  }
 
   if (
     req.body.name ||
@@ -100,23 +138,41 @@ const updateUser = asyncHandler(async (req, res) => {
     req.body.slug ||
     req.body.roles.includes("GOD")
   ) {
+    fs.unlink(profilePicturesPath, (err) => {
+      if (err) console.log(err);
+    });
     return res
       .status(400)
       .json({ message: "Hacking attampt please fuck off!", success: false });
   }
 
   if (!id) {
+    fs.unlink(profilePicturesPath, (err) => {
+      if (err) console.log(err);
+    });
     res.status(400).json({ success: false, message: "Please provide an ID" });
   }
 
   const user = await User.findById(id);
 
   if (!user) {
+    fs.unlink(profilePicturesPath, (err) => {
+      if (err) console.log(err);
+    });
     res.status(400).json({ success: false, message: "User not found!" });
   }
 
   if (user.email !== req.email) {
+    fs.unlink(profilePicturesPath, (err) => {
+      if (err) console.log(err);
+    });
     res.status(400).json({ success: false, message: "Forbidden!" });
+  }
+
+  if (req.file) {
+    fs.unlink(user.profilePicture.split("/")[1], (err) => {
+      if (err) console.log(err);
+    });
   }
 
   for (const [key, value] of Object.entries(req.body)) {
@@ -133,6 +189,8 @@ const updateUser = asyncHandler(async (req, res) => {
         console.log();
         user.isAuthor = true;
       }
+    } else if (key === "profilePicture") {
+      user.profilePicture = req.file.path;
     } else {
       user[key] = value;
     }
@@ -141,6 +199,9 @@ const updateUser = asyncHandler(async (req, res) => {
   const updatedUser = await user.save();
 
   if (!updateUser) {
+    fs.unlink(profilePicturesPath, (err) => {
+      if (err) console.log(err);
+    });
     res.status(400).json({ success: false, message: "User not found!" });
   } else {
     res.status(201).json({
@@ -188,6 +249,11 @@ const deleteUser = asyncHandler(async (req, res) => {
   if (!result) {
     res.status(400).json({ success: false, message: "Error deleting user!" });
   } else {
+    if (user.profilePicture) {
+      fs.unlink(user.profilePicture.split("/")[1], (err) => {
+        if (err) console.log(err);
+      });
+    }
     res.status(200).json({
       success: true,
       message: `User ${result.username} successfully deleted!`,
