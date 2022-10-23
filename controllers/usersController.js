@@ -29,12 +29,15 @@ const createNewUser = asyncHandler(async (req, res) => {
     req.body;
 
   // path per eliminazione in caso di errore
-  const profilePicturesPath = path.join(
-    __dirname,
-    "..",
-    "profilePictures",
-    req.file.path.split("/")[1]
-  );
+  let profilePicturesPath;
+  if (req.file) {
+    profilePicturesPath = path.join(
+      __dirname,
+      "..",
+      "profilePictures",
+      req.file.path.split("/")[1]
+    );
+  }
   //  delete img se errore
   // fs.unlink(profilePicturesPath, (err) => {
   //   if (err) console.log(err);
@@ -92,8 +95,11 @@ const createNewUser = asyncHandler(async (req, res) => {
     roles,
     slug: `username.${new Date().toISOString()}`,
     password: hashedPwd,
-    profilePicture: req.file.path,
   };
+
+  if (req.file) {
+    userToStore.profilePicture = req.file.path;
+  }
 
   // create e store user
   const user = await User.create(userToStore);
