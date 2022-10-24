@@ -123,9 +123,11 @@ const createNewUser = asyncHandler(async (req, res) => {
 // @access Private
 const updateUser = asyncHandler(async (req, res) => {
   const id = req.params.id;
+
+  let profilePicturesPath;
   if (req.file) {
     // path per eliminazione in caso di errore
-    const profilePicturesPath = path.join(
+    profilePicturesPath = path.join(
       __dirname,
       "..",
       "profilePictures",
