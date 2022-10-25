@@ -140,15 +140,16 @@ const updateUser = asyncHandler(async (req, res) => {
   if (
     req.body.name ||
     req.body.surname ||
-    req.body.username ||
     req.body.birthDate ||
     req.body.posts ||
     req.body.slug ||
-    req.body.roles.includes("GOD")
+    req.roles.includes("GOD")
   ) {
-    fs.unlink(profilePicturesPath, (err) => {
-      if (err) console.log(err);
-    });
+    if (req.file) {
+      fs.unlink(profilePicturesPath, (err) => {
+        if (err) console.log(err);
+      });
+    }
     return res
       .status(400)
       .json({ message: "Hacking attampt please fuck off!", success: false });
@@ -177,10 +178,12 @@ const updateUser = asyncHandler(async (req, res) => {
     res.status(400).json({ success: false, message: "Forbidden!" });
   }
 
-  if (req.file) {
+  if (req.file && user.profilePicture) {
     fs.unlink(user.profilePicture.split("/")[1], (err) => {
       if (err) console.log(err);
     });
+  } else if (req.file) {
+    user.profilePicture = req.file.path;
   }
 
   for (const [key, value] of Object.entries(req.body)) {
@@ -196,8 +199,6 @@ const updateUser = asyncHandler(async (req, res) => {
       if (value.includes("author") || value.includes("Author")) {
         user.isAuthor = true;
       }
-    } else if (key === "profilePicture") {
-      user.profilePicture = req.file.path;
     } else {
       user[key] = value;
     }
