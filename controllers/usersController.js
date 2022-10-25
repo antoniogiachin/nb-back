@@ -214,6 +214,17 @@ const updateUser = asyncHandler(async (req, res) => {
   } else {
     res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
 
+    const newAccessToken = jwt.sign(
+      {
+        UserInfo: {
+          email: updatedUser.email,
+          roles: updatedUser.roles,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
+    );
+
     const refreshToken = jwt.sign(
       { email: updatedUser.email },
       process.env.REFRESH_TOKEN_SECRET,
@@ -248,6 +259,7 @@ const updateUser = asyncHandler(async (req, res) => {
       success: true,
       data: userResponse,
       message: `Success update ${updatedUser.username}!`,
+      accessToken: newAccessToken,
     });
   }
 });
