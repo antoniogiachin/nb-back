@@ -71,7 +71,7 @@ const login = asyncHandler(async (req, res) => {
     posts: foundUser.posts,
     isAuthor: foundUser.isAuthor,
     birthDate: foundUser.birthDate,
-    id: updatedUser._id,
+    id: foundUser._id,
   };
 
   if (foundUser.profilePicture) {
@@ -139,7 +139,7 @@ const refresh = (req, res) => {
         posts: foundUser.posts,
         isAuthor: foundUser.isAuthor,
         birthDate: foundUser.birthDate,
-        id: updatedUser._id,
+        id: foundUser._id,
       };
 
       if (foundUser.profilePicture) {
