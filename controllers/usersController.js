@@ -6,6 +6,8 @@ const bcrypt = require("bcrypt");
 // fs for remove file
 const fs = require("fs");
 const path = require("path");
+// jwt
+const jwt = require("jsonwebtoken");
 
 // @Get all users
 // @router GET /users
@@ -209,9 +211,41 @@ const updateUser = asyncHandler(async (req, res) => {
     });
     res.status(400).json({ success: false, message: "User not found!" });
   } else {
+    res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
+
+    const refreshToken = jwt.sign(
+      { email: updatedUser.email },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    const userResponse = {
+      name: updatedUser.name,
+      surname: updatedUser.surname,
+      email: updatedUser.email,
+      username: updatedUser.username,
+      posts: updatedUser.posts,
+      isAuthor: updatedUser.isAuthor,
+      birthDate: updatedUser.birthDate,
+      id: updatedUser._id,
+    };
+
+    if (updatedUser.profilePicture) {
+      userResponse.profilePicture = updatedUser.profilePicture;
+    }
+
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true, //accessibile sol oda web browser
+      secure: true, //https disattivo per test
+      sameSite: "None", //cors
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
+    });
+
     res.status(201).json({
       success: true,
-      data: updatedUser,
+      data: userResponse,
       message: `Success update ${updatedUser.username}!`,
     });
   }
