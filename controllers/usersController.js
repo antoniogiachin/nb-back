@@ -179,9 +179,16 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 
   if (req.file && user.profilePicture) {
-    fs.unlink(user.profilePicture.split("/")[1], (err) => {
+    let userProfilePicturesPath = path.join(
+      __dirname,
+      "..",
+      "profilePictures",
+      user.profilePicture.split("/")[1]
+    );
+    fs.unlink(userProfilePicturesPath, (err) => {
       if (err) console.log(err);
     });
+    user.profilePicture = req.file.path;
   } else if (req.file) {
     user.profilePicture = req.file.path;
   }
