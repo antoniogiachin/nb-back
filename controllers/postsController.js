@@ -156,7 +156,9 @@ const createNewPost = asyncHandler(async (req, res) => {
   }
 
   // // slug
-  const slug = `${title}-${author.username}-${new Date().toISOString()}`;
+  const slug = `${title}-${author.username}-${new Date()
+    .toISOString()
+    .replaceAll(".", "-")}`;
 
   let tagsId = [];
   for (const tag of tags.split(",")) {
