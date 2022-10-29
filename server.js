@@ -38,6 +38,7 @@ app.use("/", express.static(path.join(__dirname, "public")));
 
 // altro file statico in cartella profilepictures per renderle pubbliche
 app.use("/profilePictures", express.static("profilePictures"));
+app.use("/postMediaFilesPath", express.static("postMediaFilesPath"));
 
 app.use("/", require("./routes/root"));
 
