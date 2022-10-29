@@ -10,10 +10,7 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    image: {
-      type: String,
-      required: false,
-    },
+    media: [{ type: String, required: false }],
     slug: {
       type: String,
       required: true,

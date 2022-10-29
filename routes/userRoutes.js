@@ -7,7 +7,7 @@ const authVerify = require("../middleware/authVerify");
 // multer
 const multer = require("multer");
 
-// profilepictures sotrage location
+// profilepictures storage location
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "profilePictures");
